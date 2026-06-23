@@ -19,7 +19,17 @@
     
 function addScore() {
 // YOUR CODE HERE
+    score = scoreInput.value 
+    if (!score) {
+        alert("Please enter a score")
+    } else if(0 <= score <= 100){
+        
     }
+
+    }
+
+
+}
 
     // ============================================
     // TODO 2: Write the clearAllScores() function
