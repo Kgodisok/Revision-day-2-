@@ -1,89 +1,152 @@
 // Array to store all scores
-    let scores = [];
+let scores = [];
 
 // Get HTML elements
-    const scoreInput = document.getElementById("scoreInput");
-    
-function addScore() {
-// YOUR CODE HERE
-const value = scoreInput.value;
-const score = parseFloat(value);
-
-if (value === "") {
-    alert("Please enter a score");
-} else if (score < 0 || score > 100) {
-    alert("Score must be between 0-100");
-} else {
-    scores.push(score);
-    scoreInput.value = "";
-    updateResults();
-}
-
-    
-function clearAllScores() {
-    scores = [];
-    scoreInput.value = "";
-    updateResults();
-    }
-
-
-    
-function updateResults() {
-// YOUR CODE HERE
+const scoreInput = document.getElementById("scoreInput");
 const scoreList = document.getElementById("scoreList");
-scoreList.innerHTML = "";
+const testCount = document.getElementById("testCount");
+const averageEl = document.getElementById("average");
+const bestScoreEl = document.getElementById("bestScore");
+const lowestScoreEl = document.getElementById("lowestScore");
+const gradeDisplay = document.getElementById("gradeDisplay");
+const starDisplay = document.getElementById("starDisplay");
+
+const addBtn = document.getElementById("addBtn");
+const clearBtn = document.getElementById("clearBtn");
+
+
+
+// FUNCTION 1: Add Score
+
+function addScore() {
+  const value = scoreInput.value.trim();
+
+  // Empty check
+  if (value === "") {
+    alert("Please enter a score");
+    return;
+  }
+
+  const score = Number(value);
+
+  // Valid number check
+  if (isNaN(score)) {
+    alert("Please enter a valid number");
+    return;
+  }
+
+  // Range check
+  if (score < 0 || score > 100) {
+    alert("Score must be between 0-100");
+    return;
+  }
+
+  // Add to array
+  scores.push(score);
+
+  // Clear input
+  scoreInput.value = "";
+
+  // Update UI
+  updateResults();
 }
-// PART A: Update the Score List
-if (scores.length === 0) {
-    scoreList.innerHTML = "<div>No scores yet...</div>";
-    document.getElementById("testCount").textContent = "0";
-    document.getElementById("average").textContent = "--";
-    document.getElementById("bestScore").textContent = "--";
-    document.getElementById("lowestScore").textContent = "--";
-    document.getElementById("gradeDisplay").textContent = "--";
-    document.getElementById("starDisplay").textContent = "";
-} else {
-for (let i = 0; i < scores.length; i++) {
-    const scoreItem = document.createElement("div");
-    scoreItem.className = "score-item";
-    scoreItem.textContent = `${i + 1}. ${scores[i]}`;
-    scoreList.appendChild(scoreItem);
-    }
+
+
+
+// FUNCTION 2: Clear All Scores
+
+function clearAllScores() {
+  scores = [];
+  scoreInput.value = "";
+  updateResults();
 }
-// PART B: Update the Statistics
-document.getElementById("testCount").textContent = scores.length;
-let sum = 0;
-let maxScore = scores[0];
-let minScore = scores[0];
-for (let i = 0; i < scores.length; i++) {
-    sum += scores[i];
 
+
+
+// FUNCTION 3: Update Results
+
+function updateResults() {
+
+  // -------------------------
+  // PART A: Score List
+  // -------------------------
+  scoreList.innerHTML = "";
+
+  if (scores.length === 0) {
+    scoreList.innerHTML = `<div class="empty-message">No scores yet. Add your first score! 👆</div>`;
+  } else {
+    scores.forEach((score, index) => {
+      const div = document.createElement("div");
+      div.className = "score-item";
+      div.textContent = `${index + 1}. ${score}`;
+      scoreList.appendChild(div);
+    });
+  }
+
+  // PART B: Statistics
+
+  testCount.textContent = scores.length;
+
+  if (scores.length === 0) {
+    averageEl.textContent = "--";
+    bestScoreEl.textContent = "--";
+    lowestScoreEl.textContent = "--";
+    gradeDisplay.textContent = "--";
+    starDisplay.textContent = "";
+    return;
+  }
+
+  // Average
+  const sum = scores.reduce((total, num) => total + num, 0);
+  const avg = Math.round(sum / scores.length);
+  averageEl.textContent = avg;
+
+  // Best score
+  const maxScore = Math.max(...scores);
+  bestScoreEl.textContent = maxScore;
+
+  // Lowest score
+  const minScore = Math.min(...scores);
+  lowestScoreEl.textContent = minScore;
+
+
+  // PART C: Grade System
+
+  let grade = "";
+  let stars = "";
+
+  if (avg >= 90) {
+    grade = "A";
+    stars = "⭐⭐⭐⭐⭐";
+  } else if (avg >= 80) {
+    grade = "B";
+    stars = "⭐⭐⭐⭐";
+  } else if (avg >= 70) {
+    grade = "C";
+    stars = "⭐⭐⭐";
+  } else if (avg >= 60) {
+    grade = "D";
+    stars = "⭐⭐";
+  } else {
+    grade = "F";
+    stars = "⭐";
+  }
+
+  gradeDisplay.textContent = grade;
+  starDisplay.textContent = stars;
 }
-if (scores[i] > maxScore) {
-    maxScore = scores[i];
-}
-if (scores[i] < minScore) {
-    minScore = scores[i];
-}
-const average = sum / scores.length;
-
-//Find best score
-let bestScore = Math.max(...scores);
-//Find lowest score
-let lowestScore = Math.min(...scores);
 
 
+// Event listeners
+addBtn.addEventListener("click", addScore);
+clearBtn.addEventListener("click", clearAllScores);
 
-// Add event listeners
-    document.getElementById("addBtn").addEventListener("click", addScore);
-    document.getElementById("clearBtn").addEventListener("click", clearAllScores);
+// Enter key support
+scoreInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") {
+    addScore();
+  }
+});
 
-// Allow pressing Enter to add score
-    document.getElementById("scoreInput").addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-        addScore();
-    }
-    })};
-
-// Initial update
-    updateResults();
+// Initial render
+updateResults();
